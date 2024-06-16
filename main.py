@@ -1,131 +1,119 @@
-# Example file showing a basic pygame "game loop"
 import pygame
 
-# pygame setup
+#pygame initialization
 pygame.init()
 pygame.display.set_caption("Chess by Yorgo")
 surface = pygame.display.set_mode((720, 720))
 clock = pygame.time.Clock()
 running = True
 
-
-#colors of the board
+#cboard setup
 color_dark_green = (118, 150, 86)
 color_light_green = (238, 238, 210)
-
-
-#size of each square
 square_size = 90
+offset = (square_size - 85) // 2 #assuming piece size is 85
 
 
-#draw the board
-#   doing this outside of the running loop since board will be the same every game
-for x in range(8):
-    for y in range(8):
-        if (x+ y) % 2 == 0:
-            pygame.draw.rect(surface, color_dark_green, pygame.Rect(x * square_size, y * square_size, square_size, square_size))
-        else:
-            pygame.draw.rect(surface, color_light_green, pygame.Rect(x * square_size, y * square_size, square_size, square_size))
+###PIECE CLASS ####
+class Piece:
+    def __init__(self, image_path, position, square_size, offset):
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (square_size - offset * 2, square_size - offset * 2)) 
+        self.position = position
+        self.square_size = square_size
+        self.offset = offset
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (position[0] * square_size + offset, position[1] * square_size + offset) 
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect.topleft)
+
+    def move(self, new_position):
+        self.position = new_position
+        self.rect.topleft = (new_position[0] * self.square_size + self.offset, new_position[1] * self.square_size + self.offset)
 
 
-#update surface to the screen
-pygame.display.flip()
+#funciton to draw the board
+def draw_board():
+    for x in range(8):
+        for y in range(8):
+            if (x+ y) % 2 == 0:
+                pygame.draw.rect(surface, color_dark_green, pygame.Rect(x * square_size, y * square_size, square_size, square_size))
+            else:
+                pygame.draw.rect(surface, color_light_green, pygame.Rect(x * square_size, y * square_size, square_size, square_size))
 
 
-#changing pieces changing it to be a dictionary, of  dictionaries
-#   this way I have each piece, and it's location which I can update and keep track of
+
+#dictionary with Piece class
 pieces = {
-    'pawn_b1': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (0, 1)},
-    'pawn_b2': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (1, 1)},
-    'pawn_b3': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (2, 1)},
-    'pawn_b4': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (3, 1)},
-    'pawn_b5': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (4, 1)},
-    'pawn_b6': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (5, 1)},
-    'pawn_b7': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (6, 1)},
-    'pawn_b8': {'image': pygame.image.load("Pieces Images/pawn-b.svg"), 'position': (7, 1)},
+    'pawn_b1': Piece("Pieces Images/pawn-b.svg", (0, 1), square_size, offset),
+    'pawn_b2': Piece("Pieces Images/pawn-b.svg", (1, 1), square_size, offset),
+    'pawn_b3': Piece("Pieces Images/pawn-b.svg", (2, 1), square_size, offset),
+    'pawn_b4': Piece("Pieces Images/pawn-b.svg", (3, 1), square_size, offset),
+    'pawn_b5': Piece("Pieces Images/pawn-b.svg", (4, 1), square_size, offset),
+    'pawn_b6': Piece("Pieces Images/pawn-b.svg", (5, 1), square_size, offset),
+    'pawn_b7': Piece("Pieces Images/pawn-b.svg", (6, 1), square_size, offset),
+    'pawn_b8': Piece("Pieces Images/pawn-b.svg", (7, 1), square_size, offset),
 
-    'pawn_w1': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (0, 6)},
-    'pawn_w2': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (1, 6)},
-    'pawn_w3': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (2, 6)},
-    'pawn_w4': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (3, 6)},
-    'pawn_w5': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (4, 6)},
-    'pawn_w6': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (5, 6)},
-    'pawn_w7': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (6, 6)},
-    'pawn_w8': {'image': pygame.image.load("Pieces Images/pawn-w.svg"), 'position': (7, 6)},
+    'pawn_w1': Piece("Pieces Images/pawn-w.svg", (0, 6), square_size, offset),
+    'pawn_w2': Piece("Pieces Images/pawn-w.svg", (1, 6), square_size, offset),
+    'pawn_w3': Piece("Pieces Images/pawn-w.svg", (2, 6), square_size, offset),
+    'pawn_w4': Piece("Pieces Images/pawn-w.svg", (3, 6), square_size, offset),
+    'pawn_w5': Piece("Pieces Images/pawn-w.svg", (4, 6), square_size, offset),
+    'pawn_w6': Piece("Pieces Images/pawn-w.svg", (5, 6), square_size, offset),
+    'pawn_w7': Piece("Pieces Images/pawn-w.svg", (6, 6), square_size, offset),
+    'pawn_w8': Piece("Pieces Images/pawn-w.svg", (7, 6), square_size, offset),
 
-    'knight_b1': {'image': pygame.image.load("Pieces Images/knight-b.svg"), 'position': (1, 0)},
-    'knight_b2': {'image': pygame.image.load("Pieces Images/knight-b.svg"), 'position': (6, 0)},
+    'knight_b1': Piece("Pieces Images/knight-b.svg", (1, 0), square_size, offset),
+    'knight_b2': Piece("Pieces Images/knight-b.svg", (6, 0), square_size, offset),
 
-    'knight_w1': {'image': pygame.image.load("Pieces Images/knight-w.svg"), 'position': (1, 7)},
-    'knight_w2': {'image': pygame.image.load("Pieces Images/knight-w.svg"), 'position': (6, 7)},
+    'knight_w1': Piece("Pieces Images/knight-w.svg", (1, 7), square_size, offset),
+    'knight_w2': Piece("Pieces Images/knight-w.svg", (6, 7), square_size, offset),
 
-    'bishop_b1': {'image': pygame.image.load("Pieces Images/bishop-b.svg"), 'position': (2, 0)},
-    'bishop_b2': {'image': pygame.image.load("Pieces Images/bishop-b.svg"), 'position': (5, 0)},
+    'bishop_b1': Piece("Pieces Images/bishop-b.svg", (2, 0), square_size, offset),
+    'bishop_b2': Piece("Pieces Images/bishop-b.svg", (5, 0), square_size, offset),
     
-    'bishop_w1': {'image': pygame.image.load("Pieces Images/bishop-w.svg"), 'position': (2, 7)},
-    'bishop_w2': {'image': pygame.image.load("Pieces Images/bishop-w.svg"), 'position': (5, 7)},
+    'bishop_w1': Piece("Pieces Images/bishop-w.svg", (2, 7), square_size, offset),
+    'bishop_w2': Piece("Pieces Images/bishop-w.svg", (5, 7), square_size, offset),
 
-    'rook_b1': {'image': pygame.image.load("Pieces Images/rook-b.svg"), 'position': (0, 0)},
-    'rook_b2': {'image': pygame.image.load("Pieces Images/rook-b.svg"), 'position': (7, 0)},
+    'rook_b1': Piece("Pieces Images/rook-b.svg", (0, 0), square_size, offset),
+    'rook_b2': Piece("Pieces Images/rook-b.svg", (7, 0), square_size, offset),
     
-    'rook_w1': {'image': pygame.image.load("Pieces Images/rook-w.svg"), 'position': (0, 7)},
-    'rook_w2': {'image': pygame.image.load("Pieces Images/rook-w.svg"), 'position': (7, 7)},
+    'rook_w1': Piece("Pieces Images/rook-w.svg", (0, 7), square_size, offset),
+    'rook_w2': Piece("Pieces Images/rook-w.svg", (7, 7), square_size, offset),
 
-    'queen_b': {'image': pygame.image.load("Pieces Images/queen-b.svg"), 'position': (3, 0)},
-    'queen_w': {'image': pygame.image.load("Pieces Images/queen-w.svg"), 'position': (3, 7)},
+    'queen_b': Piece("Pieces Images/queen-b.svg", (3, 0), square_size, offset),
+    'queen_w': Piece("Pieces Images/queen-w.svg", (3, 7), square_size, offset),
 
-    'king_b': {'image': pygame.image.load("Pieces Images/king-b.svg"), 'position': (4, 0)},
-    'king_w': {'image': pygame.image.load("Pieces Images/king-w.svg"), 'position': (4, 7)}
+    'king_b': Piece("Pieces Images/king-b.svg", (4, 0), square_size, offset),
+    'king_w': Piece("Pieces Images/king-w.svg", (4, 7), square_size, offset)
 }
 
 
+#draw pieces
+for piece in pieces.values():
+    piece.draw(surface)
 
-#scale for pieces size
-piece_size = 85
-
-#offset based on square size and piece size
-offset = (square_size - piece_size) // 2
-
-
-#resize each image via for loop
-for key in pieces:
-    pieces[key]['image'] = pygame.transform.scale(pieces[key]['image'], (piece_size, piece_size))
-
-
-
-# draw the pieces
-for piece_key, piece in pieces.items():
-    surface.blit(piece['image'], (piece['position'][0] * square_size + offset, piece['position'][1] * square_size + offset))
-
-
-#"Render" drawings?????? CHECK THIS VERBAGE
 pygame.display.flip()
 
 
 
-#print the position (x, y) of each piece
-print( square_size * pieces['pawn_b1']['position'][0] + offset)
-print( square_size * pieces['pawn_b1']['position'][1] + offset)
+#variables needed for click/dragging
+dragging_piece = None
+drag_offset_x = 0
+drag_offset_y = 0
 
-
-# rectangular "view" of piece
-pawn_b1_rect = pieces['pawn_b1']['image'].get_rect()
-pawn_b1_rect.topleft = (pieces['pawn_b1']['position'][0] * square_size + offset, pieces['pawn_b1']['position'][1] * square_size + offset)
-
-print(pawn_b1_rect.topleft)
-print(pawn_b1_rect.topright)
-print(pawn_b1_rect.bottomleft)
-print(pawn_b1_rect.bottomright)
-
-
+##main game loop
+running = True
 while running:
 
     #setting cursor for fun
     pygame.mouse.set_cursor(*pygame.cursors.diamond)
 
     # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
     for event in pygame.event.get():
+
+        # pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
 
@@ -136,25 +124,35 @@ while running:
                 print("left mouse button pressed")
                 mx, my = pygame.mouse.get_pos()
                 print( pygame.mouse.get_pos())
+                for piece_key, piece in pieces.items():
+                    if piece.rect.collidepoint(mx, my):
+                        dragging_piece = piece
+                        drag_offset_x = piece.rect.x - mx
+                        drag_offset_y = piece.rect.y - my
+                        break
 
-                #check if mouse press is on a piece
-                if pawn_b1_rect.collidepoint(mx, my):
-                    #change color of "piece" clicked
-                    pygame.draw.rect(surface, (255, 0, 0), pawn_b1_rect)  # Draw red rectangle over the piece_rect area
-                    pygame.display.flip()
-        
-        #detecting left mouse depress
+        #detecting left mouse UP
         elif event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1: 
-                print("left mouse has been de-pressed")
-                print( pygame.mouse.get_pos())
+            if event.button == 1 and dragging_piece is not None:
+                mx, my = pygame.mouse.get_pos()
+                new_position = (mx // square_size, my // square_size)
+                dragging_piece.move(new_position)
+                dragging_piece = None
+        elif event.type == pygame.MOUSEMOTION:
+            if dragging_piece is not None:
+                mx, my = event.pos
+                dragging_piece.rect.topleft = (mx + drag_offset_x, my + drag_offset_y)
+                
+    
+    #re-draw board and pieces
+    draw_board()
 
-
-
-    #[left_button, #scroll_button, #right_button]
-    #[bool, bool, bool]
-    #print(pygame.mouse.get_pressed())
+    for piece in pieces.values():
+        piece.draw(surface)
+    
+    pygame.display.flip()
 
     clock.tick(60)  # limits FPS to 60
 
 pygame.quit()
+

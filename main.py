@@ -65,7 +65,7 @@ def is_valid_knight_move(piece, new_position, pieces):
     #check if move forms L shape
     if (dx == 2 and dy == 1) or (dx == 1 and dy == 2):
         #destination square is empty or contains opponent's piece
-        if(end_x, end_y) not in pieces or pieces[(end_x - end_y)].color != piece.color:
+        if(end_x, end_y) not in pieces or pieces[(end_x, end_y)].color != piece.color:
             return True
     
     return False
@@ -94,7 +94,7 @@ def is_valid_bishop_move(piece, new_position, pieces):
 
 
         #check if empty or has opponent's piece
-        if(end_x, end_y) not in pieces or pieces[(end_x - end_y)].color != piece.color:
+        if(end_x, end_y) not in pieces or pieces[(end_x, end_y)].color != piece.color:
             return True
         
     return False
@@ -127,7 +127,7 @@ def is_valid_rook_move(piece, new_position, pieces):
             y += step_y
         
         #check if empty or has opponent's piece
-        if(end_x, end_y) not in pieces or pieces[(end_x - end_y)].color != piece.color:
+        if(end_x, end_y) not in pieces or pieces[(end_x, end_y)].color != piece.color:
             return True
         
     return False
@@ -202,7 +202,6 @@ pieces = {
     (5, 1): Piece("Pieces Images/pawn-b.svg", (5, 1), square_size, offset, "pawn", 'b'),
     (6, 1): Piece("Pieces Images/pawn-b.svg", (6, 1), square_size, offset, "pawn", 'b'),
     (7, 1): Piece("Pieces Images/pawn-b.svg", (7, 1), square_size, offset, "pawn", 'b'),
-
     (0, 6): Piece("Pieces Images/pawn-w.svg", (0, 6), square_size, offset, "pawn", 'w'),
     (1, 6): Piece("Pieces Images/pawn-w.svg", (1, 6), square_size, offset, "pawn", 'w'),
     (2, 6): Piece("Pieces Images/pawn-w.svg", (2, 6), square_size, offset, "pawn", 'w'),
@@ -211,116 +210,94 @@ pieces = {
     (5, 6): Piece("Pieces Images/pawn-w.svg", (5, 6), square_size, offset, "pawn", 'w'),
     (6, 6): Piece("Pieces Images/pawn-w.svg", (6, 6), square_size, offset, "pawn", 'w'),
     (7, 6): Piece("Pieces Images/pawn-w.svg", (7, 6), square_size, offset, "pawn", 'w'),
-
     (1, 0): Piece("Pieces Images/knight-b.svg", (1, 0), square_size, offset, "knight", 'b'),
     (6, 0): Piece("Pieces Images/knight-b.svg", (6, 0), square_size, offset, "knight", 'b'),
-
     (1, 7): Piece("Pieces Images/knight-w.svg", (1, 7), square_size, offset, "knight", 'w'),
     (6, 7): Piece("Pieces Images/knight-w.svg", (6, 7), square_size, offset, "knight", 'w'),
-
     (2, 0): Piece("Pieces Images/bishop-b.svg", (2, 0), square_size, offset, "bishop", 'b'),
     (5, 0): Piece("Pieces Images/bishop-b.svg", (5, 0), square_size, offset, "bishop", 'b'),
-
     (2, 7): Piece("Pieces Images/bishop-w.svg", (2, 7), square_size, offset, "bishop", 'w'),
     (5, 7): Piece("Pieces Images/bishop-w.svg", (5, 7), square_size, offset, "bishop", 'w'),
-
     (0, 0): Piece("Pieces Images/rook-b.svg", (0, 0), square_size, offset, "rook", 'b'),
     (7, 0): Piece("Pieces Images/rook-b.svg", (7, 0), square_size, offset, "rook", 'b'),
-
     (0, 7): Piece("Pieces Images/rook-w.svg", (0, 7), square_size, offset, "rook", 'w'),
     (7, 7): Piece("Pieces Images/rook-w.svg", (7, 7), square_size, offset, "rook", 'w'),
-
     (3, 0): Piece("Pieces Images/queen-b.svg", (3, 0), square_size, offset, "queen", 'b'),
     (3, 7): Piece("Pieces Images/queen-w.svg", (3, 7), square_size, offset, "queen", 'w'),
-
     (4, 0): Piece("Pieces Images/king-b.svg", (4, 0), square_size, offset, "king", 'b'),
     (4, 7): Piece("Pieces Images/king-w.svg", (4, 7), square_size, offset, "king", 'w')
 }
 
-#draw pieces
-for piece in pieces.values():
-    piece.draw(surface)
-
-pygame.display.flip()
-
-#variables needed for click/dragging
 dragging_piece = None
-drag_offset_x = 0
-drag_offset_y = 0
+dragging_offset_x = 0
+dragging_offset_y = 0
 
-##main game loop
-running = True
+# Variable to track the current player's turn
+current_turn = 'w'  # Start with white player
+
 while running:
-
-    #setting cursor for fun
-    pygame.mouse.set_cursor(*pygame.cursors.diamond)
-
-    # poll for events
     for event in pygame.event.get():
-
-        # pygame.QUIT event means the user clicked X to close your window
         if event.type == pygame.QUIT:
             running = False
-
-        #detecting left mouse press down
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1: #1 = left_mouse   2 = scroll  3 = right_mouse
-                mx, my = pygame.mouse.get_pos()
-                for piece_key, piece in pieces.items():
-                    if piece.rect.collidepoint(mx, my):
+            for piece in pieces.values():
+                if piece.rect.collidepoint(event.pos):
+                    if piece.color == current_turn:  # Check if it's the current player's turn
                         dragging_piece = piece
-                        drag_offset_x = piece.rect.x - mx
-                        drag_offset_y = piece.rect.y - my
+                        mouse_x, mouse_y = event.pos
+                        dragging_offset_x = piece.rect.x - mouse_x
+                        dragging_offset_y = piece.rect.y - mouse_y
                         break
-
-        #detecting left mouse UP
         elif event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1 and dragging_piece is not None:
-                mx, my = pygame.mouse.get_pos()
-                new_position = (mx // square_size, my // square_size)
+            if dragging_piece is not None:
+                mouse_x, mouse_y = event.pos
+                new_position = (mouse_x // square_size, mouse_y // square_size)
 
-                if dragging_piece.piece_type == 'pawn' and is_valid_pawn_move(dragging_piece, new_position, pieces):
-                    pieces.pop(dragging_piece.position)
-                    dragging_piece.move(new_position)
-                    pieces[new_position] = dragging_piece
-                elif dragging_piece.piece_type == 'knight' and is_valid_knight_move(dragging_piece, new_position, pieces):
-                    pieces.pop(dragging_piece.position)
-                    dragging_piece.move(new_position)
-                    pieces[new_position] = dragging_piece
-                elif dragging_piece.piece_type == 'bishop' and is_valid_bishop_move(dragging_piece, new_position, pieces):
-                    pieces.pop(dragging_piece.position)
-                    dragging_piece.move(new_position)
-                    pieces[new_position] = dragging_piece
-                elif dragging_piece.piece_type == 'rook' and is_valid_rook_move(dragging_piece, new_position, pieces):
-                    pieces.pop(dragging_piece.position)
-                    dragging_piece.move(new_position)
-                    pieces[new_position] = dragging_piece
-                elif dragging_piece.piece_type == 'queen' and is_valid_queen_move(dragging_piece, new_position, pieces):
-                    pieces.pop(dragging_piece.position)
-                    dragging_piece.move(new_position)
-                    pieces[new_position] = dragging_piece
-                elif dragging_piece.piece_type == 'king' and is_valid_queen_move(dragging_piece, new_position, pieces):
-                    pieces.pop(dragging_piece.position)
-                    dragging_piece.move(new_position)
-                    pieces[new_position] = dragging_piece
+                valid_move = False
+                if dragging_piece.piece_type == "pawn":
+                    valid_move = is_valid_pawn_move(dragging_piece, new_position, pieces)
+                elif dragging_piece.piece_type == "knight":
+                    valid_move = is_valid_knight_move(dragging_piece, new_position, pieces)
+                elif dragging_piece.piece_type == "bishop":
+                    valid_move = is_valid_bishop_move(dragging_piece, new_position, pieces)
+                elif dragging_piece.piece_type == "rook":
+                    valid_move = is_valid_rook_move(dragging_piece, new_position, pieces)
+                elif dragging_piece.piece_type == "queen":
+                    valid_move = is_valid_queen_move(dragging_piece, new_position, pieces)
+                elif dragging_piece.piece_type == "king":
+                    valid_move = is_valid_king_move(dragging_piece, new_position, pieces)
+
+                if valid_move:
+                    if new_position in pieces:
+                        if pieces[new_position].color != dragging_piece.color:
+                            del pieces[new_position]  # Capture the piece
+                        else:
+                            valid_move = False  # Invalid move, can't capture own piece
+
+                    if valid_move:
+                        del pieces[dragging_piece.position]
+                        dragging_piece.move(new_position)
+                        pieces[new_position] = dragging_piece
+
+                        # Switch turns after a valid move
+                        current_turn = 'b' if current_turn == 'w' else 'w'
+                    else:
+                        dragging_piece.move(dragging_piece.position) #snapback
                 else:
-                    # Reset the position of the piece if move is invalid
-                    dragging_piece.move(dragging_piece.position)
+                    dragging_piece.move(dragging_piece.position) #snapback
 
                 dragging_piece = None
         elif event.type == pygame.MOUSEMOTION:
             if dragging_piece is not None:
-                mx, my = event.pos
-                dragging_piece.rect.topleft = (mx + drag_offset_x, my + drag_offset_y)
+                mouse_x, mouse_y = event.pos
+                dragging_piece.rect.x = mouse_x + dragging_offset_x
+                dragging_piece.rect.y = mouse_y + dragging_offset_y
 
-    #re-draw board and pieces
     draw_board()
-
     for piece in pieces.values():
         piece.draw(surface)
-    
-    pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
+    pygame.display.flip()
+    clock.tick(60)
 
 pygame.quit()

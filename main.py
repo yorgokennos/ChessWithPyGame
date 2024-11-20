@@ -17,7 +17,10 @@ offset = (square_size - 85) // 2 #assuming piece size is 85
 class Piece:
     def __init__(self, image_path, position, square_size, offset, piece_type, color):
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (square_size - offset * 2, square_size - offset * 2)) 
+        self.image = pygame.transform.scale(self.image, (square_size - 2 * offset, square_size - 2 * offset)) 
+        #DEBUGGING
+        print(f"Scaled image size: {self.image.get_width()} x {self.image.get_height()}")
+        #DEBUGGING
         self.position = position
         self.square_size = square_size
         self.offset = offset
@@ -350,38 +353,38 @@ def draw_board():
 
 #dictionary with Piece class
 pieces = {
-    (0, 1): Piece("Pieces Images/pawn-b.svg", (0, 1), square_size, offset, "pawn", 'b'),
-    (1, 1): Piece("Pieces Images/pawn-b.svg", (1, 1), square_size, offset, "pawn", 'b'),
-    (2, 1): Piece("Pieces Images/pawn-b.svg", (2, 1), square_size, offset, "pawn", 'b'),
-    (3, 1): Piece("Pieces Images/pawn-b.svg", (3, 1), square_size, offset, "pawn", 'b'),
-    (4, 1): Piece("Pieces Images/pawn-b.svg", (4, 1), square_size, offset, "pawn", 'b'),
-    (5, 1): Piece("Pieces Images/pawn-b.svg", (5, 1), square_size, offset, "pawn", 'b'),
-    (6, 1): Piece("Pieces Images/pawn-b.svg", (6, 1), square_size, offset, "pawn", 'b'),
-    (7, 1): Piece("Pieces Images/pawn-b.svg", (7, 1), square_size, offset, "pawn", 'b'),
-    (0, 6): Piece("Pieces Images/pawn-w.svg", (0, 6), square_size, offset, "pawn", 'w'),
-    (1, 6): Piece("Pieces Images/pawn-w.svg", (1, 6), square_size, offset, "pawn", 'w'),
-    (2, 6): Piece("Pieces Images/pawn-w.svg", (2, 6), square_size, offset, "pawn", 'w'),
-    (3, 6): Piece("Pieces Images/pawn-w.svg", (3, 6), square_size, offset, "pawn", 'w'),
-    (4, 6): Piece("Pieces Images/pawn-w.svg", (4, 6), square_size, offset, "pawn", 'w'),
-    (5, 6): Piece("Pieces Images/pawn-w.svg", (5, 6), square_size, offset, "pawn", 'w'),
-    (6, 6): Piece("Pieces Images/pawn-w.svg", (6, 6), square_size, offset, "pawn", 'w'),
-    (7, 6): Piece("Pieces Images/pawn-w.svg", (7, 6), square_size, offset, "pawn", 'w'),
-    (1, 0): Piece("Pieces Images/knight-b.svg", (1, 0), square_size, offset, "knight", 'b'),
-    (6, 0): Piece("Pieces Images/knight-b.svg", (6, 0), square_size, offset, "knight", 'b'),
-    (1, 7): Piece("Pieces Images/knight-w.svg", (1, 7), square_size, offset, "knight", 'w'),
-    (6, 7): Piece("Pieces Images/knight-w.svg", (6, 7), square_size, offset, "knight", 'w'),
-    (2, 0): Piece("Pieces Images/bishop-b.svg", (2, 0), square_size, offset, "bishop", 'b'),
-    (5, 0): Piece("Pieces Images/bishop-b.svg", (5, 0), square_size, offset, "bishop", 'b'),
-    (2, 7): Piece("Pieces Images/bishop-w.svg", (2, 7), square_size, offset, "bishop", 'w'),
-    (5, 7): Piece("Pieces Images/bishop-w.svg", (5, 7), square_size, offset, "bishop", 'w'),
-    (0, 0): Piece("Pieces Images/rook-b.svg", (0, 0), square_size, offset, "rook", 'b'),
-    (7, 0): Piece("Pieces Images/rook-b.svg", (7, 0), square_size, offset, "rook", 'b'),
-    (0, 7): Piece("Pieces Images/rook-w.svg", (0, 7), square_size, offset, "rook", 'w'),
-    (7, 7): Piece("Pieces Images/rook-w.svg", (7, 7), square_size, offset, "rook", 'w'),
-    (3, 0): Piece("Pieces Images/queen-b.svg", (3, 0), square_size, offset, "queen", 'b'),
-    (3, 7): Piece("Pieces Images/queen-w.svg", (3, 7), square_size, offset, "queen", 'w'),
-    (4, 0): Piece("Pieces Images/king-b.svg", (4, 0), square_size, offset, "king", 'b'),
-    (4, 7): Piece("Pieces Images/king-w.svg", (4, 7), square_size, offset, "king", 'w')
+    (0, 1): Piece(r"Pieces Images\NEW\bp.png", (0, 1), square_size, offset, "pawn", 'b'),
+    (1, 1): Piece(r"Pieces Images\NEW\bp.png", (1, 1), square_size, offset, "pawn", 'b'),
+    (2, 1): Piece(r"Pieces Images\NEW\bp.png", (2, 1), square_size, offset, "pawn", 'b'),
+    (3, 1): Piece(r"Pieces Images\NEW\bp.png", (3, 1), square_size, offset, "pawn", 'b'),
+    (4, 1): Piece(r"Pieces Images\NEW\bp.png", (4, 1), square_size, offset, "pawn", 'b'),
+    (5, 1): Piece(r"Pieces Images\NEW\bp.png", (5, 1), square_size, offset, "pawn", 'b'),
+    (6, 1): Piece(r"Pieces Images\NEW\bp.png", (6, 1), square_size, offset, "pawn", 'b'),
+    (7, 1): Piece(r"Pieces Images\NEW\bp.png", (7, 1), square_size, offset, "pawn", 'b'),
+    (0, 6): Piece(r"Pieces Images\NEW\wp.png", (0, 6), square_size, offset, "pawn", 'w'),
+    (1, 6): Piece(r"Pieces Images\NEW\wp.png", (1, 6), square_size, offset, "pawn", 'w'),
+    (2, 6): Piece(r"Pieces Images\NEW\wp.png", (2, 6), square_size, offset, "pawn", 'w'),
+    (3, 6): Piece(r"Pieces Images\NEW\wp.png", (3, 6), square_size, offset, "pawn", 'w'),
+    (4, 6): Piece(r"Pieces Images\NEW\wp.png", (4, 6), square_size, offset, "pawn", 'w'),
+    (5, 6): Piece(r"Pieces Images\NEW\wp.png", (5, 6), square_size, offset, "pawn", 'w'),
+    (6, 6): Piece(r"Pieces Images\NEW\wp.png", (6, 6), square_size, offset, "pawn", 'w'),
+    (7, 6): Piece(r"Pieces Images\NEW\wp.png", (7, 6), square_size, offset, "pawn", 'w'),
+    (1, 0): Piece(r"Pieces Images\NEW\bn.png", (1, 0), square_size, offset, "knight", 'b'),
+    (6, 0): Piece(r"Pieces Images\NEW\bn.png", (6, 0), square_size, offset, "knight", 'b'),
+    (1, 7): Piece(r"Pieces Images\NEW\wn.png", (1, 7), square_size, offset, "knight", 'w'),
+    (6, 7): Piece(r"Pieces Images\NEW\wn.png", (6, 7), square_size, offset, "knight", 'w'),
+    (2, 0): Piece(r"Pieces Images\NEW\bb.png", (2, 0), square_size, offset, "bishop", 'b'),
+    (5, 0): Piece(r"Pieces Images\NEW\bb.png", (5, 0), square_size, offset, "bishop", 'b'),
+    (2, 7): Piece(r"Pieces Images\NEW\wb.png", (2, 7), square_size, offset, "bishop", 'w'),
+    (5, 7): Piece(r"Pieces Images\NEW\wb.png", (5, 7), square_size, offset, "bishop", 'w'),
+    (0, 0): Piece(r"Pieces Images\NEW\br.png", (0, 0), square_size, offset, "rook", 'b'),
+    (7, 0): Piece(r"Pieces Images\NEW\br.png", (7, 0), square_size, offset, "rook", 'b'),
+    (0, 7): Piece(r"Pieces Images\NEW\wr.png", (0, 7), square_size, offset, "rook", 'w'),
+    (7, 7): Piece(r"Pieces Images\NEW\wr.png", (7, 7), square_size, offset, "rook", 'w'),
+    (3, 0): Piece(r"Pieces Images\NEW\bq.png", (3, 0), square_size, offset, "queen", 'b'),
+    (3, 7): Piece(r"Pieces Images\NEW\wq.png", (3, 7), square_size, offset, "queen", 'w'),
+    (4, 0): Piece(r"Pieces Images\NEW\bk.png", (4, 0), square_size, offset, "king", 'b'),
+    (4, 7): Piece(r"Pieces Images\NEW\wk.png", (4, 7), square_size, offset, "king", 'w')
 }
 
 dragging_piece = None
